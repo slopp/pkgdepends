@@ -162,16 +162,18 @@ type_github_get_github_headers <- function() {
 }
 
 type_github_get_github_description_url <- function(rem) {
+  gh_raw <- getOption('pkgdepends_gh_raw', default = 'https://raw.githubusercontent.com')
   glue(
-    "https://raw.githubusercontent.com/{rem$username}",
+    "{gh_raw}/{rem$username}",
     "/{rem$repo}/{commitish}/{rem$subdir}/DESCRIPTION",
     commitish = if (nzchar(rem$commitish)) rem$commitish else "master"
   )
 }
 
 type_github_get_github_commit_url <- function(rem) {
+  gh_api <- getOption('pkgdepends_gh_api', default = 'https://api.github.com')
   glue(
-    "https://api.github.com/repos/{rem$username}/{rem$repo}",
+    "{gh_api}/repos/{rem$username}/{rem$repo}",
     "/git/trees/{commitish}",
     commitish = if (nzchar(rem$commitish)) rem$commitish else "master"
   )
@@ -259,10 +261,11 @@ type_github_make_resolution <- function(data) {
   version <- data$desc$version
   desc_err <- data$desc$error
   sha_err <- data$sha$error
-
+  
+  gh_api <- getOption('pkgdepends_gh_api', default = 'https://api.github.com')
   files <- list(
     source = glue(
-      "https://api.github.com/repos/{username}/{repo}/zipball/{sha}"),
+      "{gh_api}/repos/{username}/{repo}/zipball/{sha}"),
     target = glue("src/contrib/{package}_{version}_{sha}.tar.gz"),
     platform = "source",
     rversion = "*",
